@@ -17,6 +17,7 @@ class AccessMiddleware:
     def __init__(
         self,
         app: ASGIApp,
+        service_name: str,
         nats_servers: list[str],
         nats_subject: str,
     ) -> None:
@@ -25,6 +26,7 @@ class AccessMiddleware:
         if isinstance(nats_servers, str):
             nats_servers = parse_nats_servers(nats_servers)
         self.nats_servers = nats_servers
+        self.service_name = service_name
         self.nats_connection = None
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -41,6 +43,7 @@ class AccessMiddleware:
 
         data = {
             "url": str(url),
+            "service_name": self.service_name,
             "headers": dict(headers),
             "method": scope["method"],
             "path": scope["path"],
