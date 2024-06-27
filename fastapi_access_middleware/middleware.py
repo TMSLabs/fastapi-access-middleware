@@ -37,8 +37,16 @@ class AccessMiddleware:
 
         print("Headers: {headers}".format(headers=headers))
         print("URL: {url}".format(url=url))
-        # print(scope)
+        print("Scope: {scope9}".format(scope=scope))
 
+        data = {
+            "url": str(url),
+            "headers": dict(headers),
+            "method": scope["method"],
+            "path": scope["path"],
+            "query_string": scope["query_string"],
+        }
+        json_data = json.dumps(data)
         if self.nats_connection is None or self.nats_connection.is_closed:
             self.nats_connection = await nats.connect(servers=self.nats_servers)
 
@@ -46,7 +54,7 @@ class AccessMiddleware:
 
         try:
             response = await self.nats_connection.request(
-                self.nats_subject, b"{}", timeout=5
+                self.nats_subject, json_data.encode(), timeout=5
             )
             print("Received response: {message}".format(message=response.data.decode()))
         except nats.errors.NoRespondersError:
