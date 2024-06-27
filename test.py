@@ -6,6 +6,7 @@ from fastapi_access_middleware import AccessMiddleware
 app = FastAPI()
 app.add_middleware(
     AccessMiddleware,
+    service_name="test",
     nats_subject="oops.auth-v2.url-check",
     nats_servers=os.getenv("NATS_SERVERS"),
 )
