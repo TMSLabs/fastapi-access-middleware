@@ -39,7 +39,7 @@ class AccessMiddleware:
 
         print("Headers: {headers}".format(headers=headers))
         print("URL: {url}".format(url=url))
-        print("Scope: {scope9}".format(scope=scope))
+        print("Scope: {scope}".format(scope=scope))
 
         data = {
             "url": str(url),
