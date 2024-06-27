@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+
+[project]
+name = "fastapi_access_middleware"
+version = "0.1.0"
+description = "FastAPI middleware for access control"
+authors = [
+    { name = "Fredrik Haglund", email = "fredrik@temomailersolutions.com" },
+    { name = "Jim Rydström", email = "jim@temomailersolutions.com" }
+]
+maintainers = [
+    { name = "Fredrik Haglund", email = "fredrik@temomailersolutions.com" },
+    { name = "Jim Rydström", email = "jim@temomailersolutions.com" }
+]
+readme = "README.md"
+keywords = ['FastAPI', 'Access', 'Middleware', 'Authentication', 'Authorization']
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Developers',
+    'Topic :: Internet :: WWW/HTTP :: Session',
+    'Topic :: Internet :: WWW/HTTP :: WSGI',
+    'Topic :: Software Development :: Libraries :: Application Frameworks',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Framework :: FastAPI',
+    'License :: OSI Approved :: Apache Software License',
+    'Programming Language :: Python :: 3.7',
+]
+requires-python = ">=3.7"
+dependencies = [
+    "anyio>=3.5.0",
+    "fastapi>=0.73.0",
+    "idna>=3.3",
+    "pydantic>=1.9.0",
+    "sniffio>=1.2.0",
+    "starlette>=0.17.1",
+    "typing_extensions>=4.0.1",
+    "python-jose>=3.3.0",
+    "certifi>=2022.12.07",
+    "nats-py>=2.7.2",
+]
+
+[project.urls]
+Documentation = "https://github.com/tmslabs/fastapi-access-middleware"
+Source = "https://github.com/tmslabs/fastapi-access-middleware"
