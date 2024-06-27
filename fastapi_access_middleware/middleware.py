@@ -20,6 +20,7 @@ class AccessMiddleware:
         service_name: str,
         nats_servers: list[str],
         nats_subject: str,
+        exclude_paths: list[str] = [],
         test: bool = False,
     ) -> None:
         self.app = app
@@ -29,10 +30,15 @@ class AccessMiddleware:
         self.nats_servers = nats_servers
         self.service_name = service_name
         self.nats_connection = None
+        self.exclude_paths = exclude_paths
         self.test = test
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] not in ("http", "websocket"):  # pragma: no cover
+            await self.app(scope, receive, send)
+            return
+
+        if scope["path"] in self.exclude_paths:
             await self.app(scope, receive, send)
             return
 
