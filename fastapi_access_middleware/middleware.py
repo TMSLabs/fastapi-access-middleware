@@ -44,10 +44,10 @@ class AccessMiddleware:
         data = {
             "url": str(url),
             "service_name": self.service_name,
-            "headers": dict(headers),
+            "headers": str(headers),
             "method": scope["method"],
             "path": scope["path"],
-            "query_string": scope["query_string"],
+            "query_string": str(scope["query_string"]),
         }
         json_data = json.dumps(data)
         if self.nats_connection is None or self.nats_connection.is_closed:
