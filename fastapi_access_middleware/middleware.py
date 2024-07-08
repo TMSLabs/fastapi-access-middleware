@@ -60,24 +60,24 @@ class AccessMiddleware:
         tmp = {}
 
         if not self.test:
-            if self.nats_connection is None or self.nats_connection.is_closed:
-                self.nats_connection = await nats.connect(servers=self.nats_servers)
-
             try:
-                response = await self.nats_connection.request(
+                if self.nats_connection is None or self.nats_connection.is_closed:
+                    self.nats_connection = await nats.connect(servers=self.nats_servers)
+
+                msg = await self.nats_connection.request(
                     self.nats_subject, json_data.encode(), timeout=5
                 )
-                tmp = json.loads(response.data.decode())
+                tmp = json.loads(msg.data.decode())
 
-                print(
-                    "Received response: {message}".format(
-                        message=response.data.decode()
-                    )
+                print("Received response: {message}".format(message=msg.data.decode()))
+            except Exception as e:
+                print(f"Error: {e}")
+                response: Response
+                response = PlainTextResponse(
+                    "500 Internal Server Error", status_code=500
                 )
-            except nats.errors.NoRespondersError:
-                print("NATS - No responders available for request")
-            except TimeoutError:
-                print("NATS - Request timed out")
+                await response(scope, receive, send)
+                return
         else:
             tmp = {"access": True}
             print(json_data)
@@ -91,5 +91,5 @@ class AccessMiddleware:
             await self.app(scope, receive, send)
         else:
             response: Response
-            response = PlainTextResponse("Unauthorized", status_code=401)
+            response = PlainTextResponse("404 Page Not Found", status_code=404)
             await response(scope, receive, send)
