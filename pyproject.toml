@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 
 [project]
 name = "fastapi_access_middleware"
-version = "0.1.0"
+version = "0.2.0"
 description = "FastAPI middleware for access control"
 authors = [
     { name = "Fredrik Haglund", email = "fredrik@temomailersolutions.com" },
