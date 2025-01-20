@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 # import typing
-import nats
 import json
 import time
+import nats
 
 from starlette.datastructures import URL, Headers
 from starlette.responses import PlainTextResponse, Response
@@ -21,7 +21,7 @@ class AccessMiddleware:
         service_name: str,
         nats_servers: list[str],
         nats_subject: str,
-        exclude_paths: list[str] = [],
+        exclude_paths: list[str],
         test: bool = False,
     ) -> None:
         self.app = app
@@ -71,9 +71,9 @@ class AccessMiddleware:
                 )
                 tmp = json.loads(msg.data.decode())
 
-                print("Received response: {message}".format(message=msg.data.decode()))
-            except Exception as e:
-                print(f"Error: {e}")
+                print(f"Received response: {msg.data.decode()}")
+            except Exception as exp:  # pylint: disable=broad-exception-caught
+                print(f"Error: {exp}")
                 response: Response
                 response = PlainTextResponse(
                     "500 Internal Server Error", status_code=500
@@ -96,12 +96,12 @@ class AccessMiddleware:
 
             response_time = end - start
 
-            id = 0
+            row_id = 0
             if "id" in tmp:
-                id = tmp["id"]
+                row_id = tmp["id"]
 
             result = {
-                "id": id,
+                "id": row_id,
                 "status": "OK",
                 "response_time": format_str_time(response_time),
             }
