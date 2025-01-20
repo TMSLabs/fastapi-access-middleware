@@ -3,6 +3,7 @@ from __future__ import annotations
 # import typing
 import nats
 import json
+import time
 
 from starlette.datastructures import URL, Headers
 from starlette.responses import PlainTextResponse, Response
@@ -55,6 +56,7 @@ class AccessMiddleware:
             "service_name": self.service_name,
             "type": scope["type"],
             "url": str(url),
+            "version": "v2",
         }
         json_data = json.dumps(data)
         tmp = {}
@@ -79,7 +81,7 @@ class AccessMiddleware:
                 await response(scope, receive, send)
                 return
         else:
-            tmp = {"access": True}
+            tmp = {"access": True, "id": 0}
             print(json_data)
 
         is_valid_access = False
@@ -88,8 +90,43 @@ class AccessMiddleware:
             is_valid_access = tmp["access"]
 
         if is_valid_access:
+            start = time.time()
             await self.app(scope, receive, send)
+            end = time.time()
+
+            response_time = end - start
+
+            id = 0
+            if "id" in tmp:
+                id = tmp["id"]
+
+            result = {
+                "id": id,
+                "status": "OK",
+                "response_time": format_str_time(response_time),
+            }
+            result_json = json.dumps(result)
+
+            await self.nats_connection.publish(
+                self.nats_subject + ".result", result_json.encode()
+            )
         else:
             response: Response
             response = PlainTextResponse("404 Page Not Found", status_code=404)
             await response(scope, receive, send)
+
+
+def format_str_time(seconds: float) -> str:
+    if seconds < 1:
+        if seconds < 1e-6:
+            return f"{(seconds * 1e9):.3f}ns"
+        elif seconds < 1e-3:
+            return f"{(seconds * 1e6):.3f}µs"
+        else:
+            return f"{(seconds * 1000):.3f}ms"
+    elif seconds < 60:
+        return f"{(seconds):.3f}s"
+    elif seconds < 3600:
+        return f"{(seconds // 60)}m {(seconds % 60):.3f}s"
+    else:
+        return f"{(seconds // 3600)}h {((seconds % 3600) // 60)}m {(seconds % 60):.3f}s"
